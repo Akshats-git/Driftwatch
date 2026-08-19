@@ -60,7 +60,13 @@ export default tseslint.config(
         ...globals.node,
       },
       parserOptions: {
-        projectService: true,
+        // Root-level tool config files (e.g. packages/db/drizzle.config.ts)
+        // that intentionally sit outside their package's own tsconfig
+        // `include` still get parsed via a one-off default project here,
+        // rather than needing to join the package's build.
+        projectService: {
+          allowDefaultProject: ["packages/db/drizzle.config.ts"],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
