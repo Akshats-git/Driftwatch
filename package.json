@@ -14,7 +14,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test --if-present"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
