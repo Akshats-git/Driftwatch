@@ -13,13 +13,13 @@ Vercel, `packages/ingestion` to Fly.io, independently of each other.
 
 ## Monorepo layout
 
-| Path                 | What it is                                                                                   | Status                                           |
-| -------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| `apps/web`           | Next.js 16 (App Router) dashboard. TypeScript strict, Tailwind CSS v4, shadcn/ui.            | Placeholder home page only.                      |
-| `packages/ingestion` | Standalone Hono service on Node (`@hono/node-server`), deployed independently of `apps/web`. | `GET /health` only.                              |
-| `packages/db`        | Drizzle ORM wired to Postgres (Supabase).                                                    | Wiring only — `src/schema.ts` has no tables yet. |
-| `packages/cli`       | —                                                                                            | Empty, not started.                              |
-| `packages/config`    | —                                                                                            | Empty, not started.                              |
+| Path                 | What it is                                                                                   | Status                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `apps/web`           | Next.js 16 (App Router) dashboard. TypeScript strict, Tailwind CSS v4, shadcn/ui.            | Placeholder home page only.                               |
+| `packages/ingestion` | Standalone Hono service on Node (`@hono/node-server`), deployed independently of `apps/web`. | `GET /health` only.                                       |
+| `packages/db`        | Drizzle ORM wired to Postgres (Supabase).                                                    | Wiring only — `src/schema.ts` has no tables yet.          |
+| `packages/cli`       | —                                                                                            | Empty, not started.                                       |
+| `packages/config`    | Shared config/data consumed by other packages — currently the tracked-vendor list.           | `src/vendors.ts`, 8 vendors seeded, no Collector IDs yet. |
 
 Each package's own `README.md` has package-specific run instructions; this
 file is about decisions and structure that span the whole repo.
@@ -131,17 +131,19 @@ and `eslint-config-next`'s plugin chain don't support TS7 yet. Same reasoning
 kept root ESLint on `^9` rather than `10`. Re-check these pins before
 bumping either package.
 
-## Bright Data Collectors (Phase 1 — not started yet)
+## Bright Data Collectors (Phase 1 — Collector IDs not filled in yet)
 
-`packages/ingestion` will drive Bright Data Collectors to scrape each vendor
-being watched. None are configured yet — no vendors, targets, or Collector
-IDs exist in this repo currently. This table is the scaffold to fill in
-during Phase 1, one row per vendor/target:
+The tracked-vendor list is code, not a markdown table — see
+`packages/config/src/vendors.ts` (the `Vendor` type and the seeded
+`vendors` array), which `packages/ingestion` will import to drive Bright
+Data Collectors. Don't duplicate the vendor list here; it'll drift out of
+sync with the code.
 
-| Vendor | Collector ID | Target(s) watched | Notes |
-| ------ | ------------ | ----------------- | ----- |
-| _TBD_  | _TBD_        | _TBD_             | _TBD_ |
-
-Collector IDs come from the Bright Data dashboard (Web Scrapers → the
-collector → API). The API key itself goes in `.env` (`BRIGHTDATA_API_KEY`,
-see `.env.example`) — never here.
+8 vendors are seeded (Clerk, Resend, Supabase, PlanetScale, Upstash, Neon,
+Trigger.dev, Better Auth — all confirmed live with public docs/changelogs
+as of when they were added; re-verify before trusting an old memory of
+this list). Each has empty `collectorIds: []`, to be filled in during
+Phase 1 as Collectors are created for them. Collector IDs come from the
+Bright Data dashboard (Web Scrapers → the collector → API). The API key
+itself goes in `.env` (`BRIGHTDATA_API_KEY`, see `.env.example`) — never
+in `vendors.ts`.
